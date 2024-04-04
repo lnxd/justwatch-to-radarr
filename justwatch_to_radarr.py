@@ -1,10 +1,10 @@
 import requests
 
 release_year = 2024  # Year to set for movie release and filter
-filter_year_min = 2024  # Minimum year for movies
-filter_year_max = 2024  # Maximum year for movies
+filter_year_min = 2024  # Minimum year for filtering movies
+filter_year_max = 2024  # Maximum year for filtering movies
 num_movies = 30  # Number of movies to fetch from JustWatch
-radarr_url = "http://0.0.0.0:7878/api/v3/movie" # Set a valid Radarr url
+radarr_url = "http://10.1.0.3:7878/api/v3/movie"
 quality_profile_id = 7  # Update this according to your quality profile ID in Radarr
 root_folder_path = "/movies-en/"  # Update this to your Radarr movies root folder path
 tmdb_api_key = ""
@@ -54,7 +54,7 @@ justwatch_query_data = {
         },
         "popularTitlesSortBy": "POPULAR",
     },
-    "query": "...",
+    "query": 'query GetPopularTitles($allowSponsoredRecommendations: SponsoredRecommendationsInput!, $country: Country!, $first: Int!, $language: Language!, $popularTitlesFilter: TitleFilter!, $popularTitlesSortBy: PopularTitlesSorting!) {\n  popularTitles(allowSponsoredRecommendations: $allowSponsoredRecommendations, country: $country, filter: $popularTitlesFilter, first: $first, sortBy: $popularTitlesSortBy, offset: null, after: "") {\n    edges {\n      node {\n        content(country: $country, language: $language) {\n          title\n          externalIds {\n            imdbId\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n',
 }
 
 
@@ -62,7 +62,8 @@ def get_popular_movies():
     """
     Get popular movies from JustWatch using their GraphQL API. This function returns a list of dictionaries
     that contain the title and IMDb ID of each movie. I was not aware that JustWatch had a public API when I
-    wrote this script, so I reverse engineered their GraphQL API.
+    wrote this script, so I reverse engineered their GraphQL API. This script should be updated to use the
+    public API instead to prevent it from breaking in the future.
     """
     url = "https://apis.justwatch.com/graphql"
 
