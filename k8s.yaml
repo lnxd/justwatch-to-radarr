@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: popularadder-secrets
+  namespace: media
+type: Opaque
+stringData:
+  radarr-api-key: ""
+  tmdb-api-key: ""
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: popularadder
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: popularadder
+  template:
+    metadata:
+      labels:
+        app: popularadder
+    spec:
+      containers:
+        - name: popularadder
+          image: popularadder:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          env:
+            - name: TZ
+              value: "Australia/Melbourne"
+            - name: RADARR_URL
+              value: "http://radarr:7878"
+            - name: RADARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: popularadder-secrets
+                  key: radarr-api-key
+            - name: TMDB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: popularadder-secrets
+                  key: tmdb-api-key
+            - name: ROOT_FOLDER
+              value: "/movies/"
+            - name: QUALITY_PROFILE_ID
+              value: "1"
+            - name: SYNC_HOURS
+              value: "6"
+            - name: MOVIE_LIMIT
+              value: "100"
+            - name: TAG_NAME
+              value: "popular"
+            - name: COUNTRY
+              value: "AU"
+            - name: RELEASE_YEAR_MIN
+              value: "2010"
+            - name: RELEASE_YEAR_MAX
+              value: "2030"
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
